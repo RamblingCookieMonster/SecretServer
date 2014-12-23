@@ -37,8 +37,8 @@ Get connected:
 #Prerequisites
     
  * You must be using Windows PowerShell 3 or later on the system running this module
- * You must enable Secret Server Web Services ahead of time.  See product documentation for instructions.
- * You must enable Integrated Windows Authentication.  This may change.  See product documentation for instructions.
+ * You must enable Secret Server Web Services ahead of time.  See [product documentation](http://thycotic.com/products/secret-server/support-2/) for instructions.
+ * You must enable Integrated Windows Authentication for Secret Server.  This may change.  See [product documentation](http://support.thycotic.com/kb/a90/setting-up-integrated-windows-authentication.aspx) for instructions.
  * We serialize a default Uri and proxy to SecretServerConfig.xml in the module path - you must have access to that path for this functionality
  * The account running these functions must have appropriate access to Secret Server
  * Module folder downloaded, unblocked, extracted, available to import
@@ -75,3 +75,8 @@ Get connected:
             Password : System.Security.SecureString
         #>
         
+#Aside
+
+On an aside, if you don't have a password management solution in place, definitely take a look at [Secret Server](http://thycotic.com/products/secret-server/compare-installed-editions/).
+
+I've been impressed with the product, documentation, and support.  It's one of those products that just works, and works well.  If you're a non-profit, you'll save a bit...
