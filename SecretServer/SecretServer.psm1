@@ -37,10 +37,22 @@
         $SecretServerConfig = Get-SecretServerConfig -ErrorAction Stop
 
         #If a proxy is defined, create the proxy
-        $SSUri = $SecretServerConfig.Proxy.url
-        
+        $SSProxyUri = $SecretServerConfig.Proxy.url
+        $SSUri = $SecretServerConfig.Uri
+
         #Rehydrate the proxy, if one existed...
-        if($SSUri)
+        if($SSProxyUri)
+        {
+            try
+            {
+                $SecretServerConfig.Proxy = New-SSConnection -Uri $SSProxyUri -ErrorAction stop -Passthru
+            }
+            catch
+            {
+                Write-Warning "Error rehydrating proxy for '$SSProxyUri': $_"
+            }
+        }
+        elseif($SSUri)
         {
             try
             {
@@ -48,7 +60,7 @@
             }
             catch
             {
-                Write-Warning "Error rehydrating proxy for '$SSUri': $_"
+                Write-Warning "Error creating proxy for '$SSUri': $_"
             }
         }
     }
