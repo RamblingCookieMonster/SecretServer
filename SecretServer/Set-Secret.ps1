@@ -1,4 +1,4 @@
-﻿Function Set-SSSecret
+﻿Function Set-Secret
 {
     <#
     .SYNOPSIS
@@ -42,12 +42,15 @@
     .PARAMETER Domain
         If specified, update to this Domain
 
+    .PARAMETER Force
+        If specified, suppress prompt for confirmation
+
     .PARAMETER WebServiceProxy
         An existing Web Service proxy to use.  Defaults to $SecretServerConfig.Proxy
 
     .PARAMETER Uri
         Uri for your win auth web service.  Defaults to $SecretServerConfig.Uri.  Overridden by WebServiceProxy parameter
-    
+
     .EXAMPLE
         Get-Secret webcommander | Set-Secret -Notes "Nothing to see here"
 
@@ -58,7 +61,7 @@
         Secret Server
 
     #>
-    [cmdletbinding()]
+    [cmdletbinding(SupportsShouldProcess=$true, ConfirmImpact="Medium")]
     param(
         [Parameter( Mandatory=$false, 
                     ValueFromPipelineByPropertyName=$true, 
@@ -83,11 +86,15 @@
         [string]$Machine,
         [string]$Domain,
 
+        [switch]$Force,
+
         [string]$Uri = $SecretServerConfig.Uri,
         [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy
     )
     Begin
     {
+        $RejectAll = $false
+        $ConfirmAll = $false
 
         if(-not $WebServiceProxy.whoami)
         {
@@ -127,37 +134,52 @@
             {
                 Throw "Error obtaining secret: $_"
             }
-
-        #Update the properties.  We can loop over some common field names we offer as parameters
-            if($SecretName)
-            {
-                $Secret.Name = $SecretName
-            }
-
+            
+            #These are properties that might be set...
             $CommonProps = Echo Username, Password, Notes, Server, URL, Resource, Machine, Domain
-            foreach($CommonProp in $CommonProps)
+            
+            #Update the properties.  We can loop over some common field names we offer as parameters
+            if($PSCmdlet.ShouldProcess( "Processed the Secret '$($Secret | Out-String)'",
+                                        "Process the Secret '$($Secret | Out-String)'?",
+                                        "Processing Secret" ))
             {
-                if($PSBoundParameters.ContainsKey($CommonProp))
-                {
-                    $Val = $PSBoundParameters[$CommonProp]
-                    if($Secret.Items.FieldName -contains $CommonProp)
+                $NewSecretPropsString = $PSBoundParameters.GetEnumerator() | Where-Object {$CommonProps -contains $_.Key} | Format-Table -AutoSize | Out-String
+
+                if($Force -Or $PSCmdlet.ShouldContinue("Are you REALLY sure you want to change existing`n'$($Secret | Out-String)`n with changes:`n$NewSecretPropsString'?", "Processing '$($Secret | Out-String)'", [ref]$ConfirmAll, [ref]$RejectAll)) {
+                    if($SecretName)
                     {
-                        $Secret.Items | ForEach-Object {
-                            if($_.FieldName -like $CommonProp)
+                        $Secret.Name = $SecretName
+                    }
+
+                    foreach($CommonProp in $CommonProps)
+                    {
+                        if($PSBoundParameters.ContainsKey($CommonProp))
+                        {
+                            $Val = $PSBoundParameters[$CommonProp]
+                            if($Secret.Items.FieldName -contains $CommonProp)
                             {
-                                Write-Verbose "Changing $CommonProp from '$($_.Value)' to '$Val'"
-                                $_.Value = $Val
+                                $Secret.Items | ForEach-Object {
+                                    if($_.FieldName -like $CommonProp)
+                                    {
+                                        Write-Verbose "Changing $CommonProp from '$($_.Value)' to '$Val'"
+                                        $_.Value = $Val
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Write-Error "You specified parameter '$CommonProp'='$Val'. This property does not exist on this secret."
                             }
                         }
-                    }
-                    else
-                    {
-                        Write-Error "You specified parameter '$CommonProp'='$Val'. This property does not exist on this secret."
-                    }
-                }
 
-            }
+                    }
         
-            $WebServiceProxy.UpdateSecret($Secret)
+                    $WebServiceProxy.UpdateSecret($Secret)
+
+
+                }
+            }
+
+        
     }
 }

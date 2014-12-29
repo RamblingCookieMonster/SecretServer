@@ -16,14 +16,14 @@
         Return the proxy object
 
     .PARAMETER UpdateSecretConfig
-        Update the Proxy set in SecretServerConfig.xml and $SecretServerConfig.Proxy
+        Update the Proxy set in SecretServer.xml and $SecretServerConfig.Proxy
 
     .EXAMPLE
         New-SSConnection
 
         # Create a proxy to the Uri from $SecretServerConfig.Uri
         # Set the $SecretServerConfig.Proxy to this value
-        # Set the Proxy property in SecretServerConfig.xml to this value
+        # Set the Proxy property in SecretServer.xml to this value
 
     .EXAMPLE
         $Proxy = New-SSConnection -Uri https://FQDN.TO.SECRETSERVER/winauthwebservices/sswinauthwebservice.asmx -Passthru
@@ -57,7 +57,7 @@
 
         if($UpdateSecretConfig)
         {
-            Set-SSSecretServerConfig -Proxy $Proxy
+            Set-SecretServerConfig -Proxy $Proxy
         }
 
 
