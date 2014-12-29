@@ -58,6 +58,12 @@
         if($UpdateSecretConfig)
         {
             Set-SecretServerConfig -Proxy $Proxy
+            if(-not (Get-SecretServerConfig).Uri)
+            {
+                Set-SecretServerConfig -Uri $Proxy.url
+                $SecretServerConfig.Uri = $Proxy.url
+            }
+            $SecretServerConfig.Proxy = $Proxy
         }
 
 
