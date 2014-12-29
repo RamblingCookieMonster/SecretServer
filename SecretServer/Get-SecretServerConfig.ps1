@@ -1,4 +1,4 @@
-﻿Function Get-SSSecretServerConfig {
+﻿Function Get-SecretServerConfig {
     <#
     .SYNOPSIS
         Get Secret Server module configuration.

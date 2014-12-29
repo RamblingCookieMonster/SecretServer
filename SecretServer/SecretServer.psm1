@@ -34,7 +34,7 @@
     {
         #Import the config
         $SecretServerConfig = $null
-        $SecretServerConfig = Get-SSSecretServerConfig -ErrorAction Stop
+        $SecretServerConfig = Get-SecretServerConfig -ErrorAction Stop
 
         #If a proxy is defined, create the proxy
         $SSUri = $SecretServerConfig.Proxy.url
@@ -58,10 +58,16 @@
     }
 
 #Create some aliases, export public functions and the SecretServerConfig variable
-    New-Alias -Name "Get-Secret" -Value "Get-SSSecret" -Force
-    New-Alias -Name "Set-Secret" -Value "Set-SSSecret" -Force
-    New-Alias -Name "New-Secret" -Value "New-Secret" -Force
-    New-Alias -Name "Get-SecretServerConfig" -Value "Get-SSSecretServerConfig" -Force
-    New-Alias -Name "Set-SecretServerConfig" -Value "Set-SSSecretServerConfig" -Force
+    $PublicNames = $Public | Select -ExpandProperty BaseName
+    
+    #We create aliases for functions starting with 'Secret', prepending SS for consistency.  Other functions already start with SS
+    foreach($Func in $PublicNames)
+    {
+        if($Func -match "-Secret")
+        {
+            $FuncNew = $Func.Replace("-", "-SS")
+            New-Alias -Name $FuncNew -Value $Func -Force
+        }
+    }
 
-    Export-ModuleMember -Function $($Public | Select -ExpandProperty BaseName) -Alias * -Variable SecretServerConfig
+    Export-ModuleMember -Function $PublicNames -Alias * -Variable SecretServerConfig

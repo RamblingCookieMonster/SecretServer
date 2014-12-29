@@ -1,4 +1,4 @@
-﻿Function Get-SSSecret
+﻿Function Get-Secret
 {
     <#
     .SYNOPSIS
@@ -85,6 +85,12 @@
                 Throw "Error creating proxy for $Uri`: $_"
             }
         }
+
+        #If the ID was specified, we need a way to go from secret template ID to secret template name...
+        if($SecretId)
+        {
+            $TemplateTable = Get-TemplateTable
+        }
     }
     Process
     {
@@ -137,13 +143,22 @@
                     }
                     else
                     {
-
                         #Start building up output
-                        $Hash = [ordered]@{}
-                        $Hash.SecretId = $Secret.SecretId
-                        $Hash.SecretType = $Secret.SecretTypeName
-                        $Hash.SecretName = $Secret.SecretName
-                        $Hash.SecretErrors = $SecretOutput.SecretErrors
+                        $Hash = [ordered]@{
+                            SecretId = $Secret.SecretId
+                            SecretType = $Secret.SecretTypeName
+                            SecretName = $Secret.SecretName
+                            SecretErrors = $SecretOutput.SecretErrors
+                        }
+
+                        #If we obtained by Id, we don't have the same fields above... get them from SecretDetail
+                        if($SecretId)
+                        {
+                            $SecretTypeId = $SecretDetail.SecretTypeId
+                            $Hash.SecretId = $SecretDetail.Id
+                            $Hash.SecretType = $TemplateTable.$SecretTypeId
+                            $Hash.SecretName = $SecretDetail.Name
+                        }
 
                         #Items contains a collection of properties about the secret that can change based on the type of secret
                             foreach($Item in $SecretDetail.Items)

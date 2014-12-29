@@ -57,11 +57,14 @@ Get connected:
         Get-Command -Module SecretServer
         
     #Get help for a command
-        Get-Help Get-Secret -Full
+        Get-Help New-SSConnection -Full
         
     #Optional one time step: Set default Uri, create default proxy
         Set-SecretServerConfig -Uri https://FQDN.TO.SECRETSERVER/winauthwebservices/sswinauthwebservice.asmx
         New-SSConnection #Uses Uri we just set by default
+        
+    #Get help for Get-Secret
+        Get-Help Get-Secret -Full
         
     #List a summary of all secrets
         Get-Secret 

@@ -1,4 +1,4 @@
-﻿Function Set-SSSecretServerConfig {
+﻿Function Set-SecretServerConfig {
     <#
     .SYNOPSIS
         Set Secret Server module configuration.
@@ -19,10 +19,10 @@
 
         $Proxy = New-WebServiceProxy -Uri $uri -UseDefaultCredential
 
-        Set-SSSecretServerConfig -Proxy $Proxy -Uri $Uri
+        Set-SecretServerConfig -Proxy $Proxy -Uri $Uri
 
     .Example
-        Set-SSSecretServerConfig -Uri 'https://SecretServer.Example/winauthwebservices/sswinauthwebservice.asmx'
+        Set-SecretServerConfig -Uri 'https://SecretServer.Example/winauthwebservices/sswinauthwebservice.asmx'
 
     .FUNCTIONALITY
         Secret Server
@@ -35,7 +35,7 @@
 
     Try
     {
-        $Existing = Get-SSSecretServerConfig -ErrorAction stop
+        $Existing = Get-SecretServerConfig -ErrorAction stop
     }
     Catch
     {
