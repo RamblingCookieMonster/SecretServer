@@ -13,6 +13,9 @@
     .PARAMETER SearchTerm
         String to search for.  Accepts wildcards as '*'.
 
+    .PARAMETER SecretId
+        SecretId to search for.
+
     .PARAMETER As
         Summary (Default)  Do not return secret details, only return the secret summary.  No audit event triggered
         Credential         Build credential from stored domain (optional), username, password
@@ -22,6 +25,12 @@
     .PARAMETER LoadSettingsAndPermissions
         Load permissions and settings for each secret.  Only applicable for Raw output.
     
+    .PARAMETER IncludeDeleted
+        Include deleted secrets
+
+    .PARAMETER IncludeRestricted
+        Include restricted secrets
+
     .PARAMETER WebServiceProxy
         An existing Web Service proxy to use.  Defaults to $SecretServerConfig.Proxy
 
@@ -87,7 +96,7 @@
         }
 
         #If the ID was specified, we need a way to go from secret template ID to secret template name...
-        if($SecretId)
+        if($SecretId -and $As -ne "Raw")
         {
             $TemplateTable = Get-TemplateTable
         }
