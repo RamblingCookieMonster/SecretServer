@@ -38,6 +38,8 @@
     .PARAMETER Password
         Password
 
+        This takes a secure string, not a string
+
     .PARAMETER Notes
         Notes
 
@@ -57,14 +59,17 @@
         Uri for your win auth web service.  Defaults to $SecretServerConfig.Uri.  Overridden by WebServiceProxy parameter
 
     .EXAMPLE
-        New-Secret -SecretType 'Active Directory Account' -Domain Contoso.com -Username SQLServiceX -password "***********" -notes "SQL Service account for SQLServerX\Instance" -FolderPath "*SQL Service"
+        New-Secret -SecretType 'Active Directory Account' -Domain Contoso.com -Username SQLServiceX -password $Credential.Password -notes "SQL Service account for SQLServerX\Instance" -FolderPath "*SQL Service"
 
         Create an active directory account for Contoso.com, user SQLServiceX, include notes that point to the SQL instance running it, specify a folder path matching SQL Service. 
 
     .EXAMPLE
-        New-Secret -SecretType 'SQL Server Account' -Server ServerNameX -Username sa -Password "**********" -FolderID 25
+        
+        $SecureString = Read-Host -AsSecureString -Prompt "Enter password"
+        New-Secret -SecretType 'SQL Server Account' -Server ServerNameX -Username sa -Password $SecureString -FolderID 25
 
-        Create a SQL account secret for the sa login on instance ServerNameX, put it in folder 25 (DBA)
+        Create a secure string we will pass in for the password.
+        Create a SQL account secret for the sa login on instance ServerNameX, put it in folder 25 (DBA).
 
     .FUNCTIONALITY
         Secret Server
@@ -104,8 +109,7 @@
         [string]$Username,
 
         [parameter( Mandatory = $True)]
-        [string]$Password,
-        #TODO:  Combine username and Password into credential input.  Challenge: username may be optional...
+        [System.Security.SecureString]$Password,
         
         [string]$Notes,
 
@@ -247,7 +251,21 @@
 
         $FieldValues = Foreach($FieldName in $Fields.DisplayName)
         {
-            $InputHash.$FieldName
+            if($FieldName -eq "Password")
+            {
+                try
+                {
+                    Convert-SecStrToStr -secstr ($InputHash.$FieldName) -ErrorAction stop
+                }
+                catch
+                {
+                    Throw "$_"
+                }
+            }
+            else
+            {
+                $InputHash.$FieldName
+            }
         }
     
         #We have everything, add the secret
