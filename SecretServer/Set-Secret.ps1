@@ -22,7 +22,9 @@
         If specified, update to this username
 
     .PARAMETER Password
-        If specified, update to this Password
+        If specified, update to this Password.
+
+        This takes a secure string, not a string
 
     .PARAMETER Notes
         If specified, update to this Notes
@@ -57,6 +59,14 @@
         #Get the secret for webcommander, set the notes field to 'nothing to see here'.
         #If multiple results matched webcommander, we would get an error.
 
+    .EXAMPLE
+        
+        #Get the password we will pass in.  We need a secure string.  There are many ways to do this...
+        $Credential = Get-Credential -username none -message 'Enter a password'
+        
+        #Change the secret password for secret 5
+        Set-Secret -SecretId 5 -Password $Credential.Password
+
     .FUNCTIONALITY
         Secret Server
 
@@ -77,7 +87,7 @@
 
         [String]$SecretName,
         [string]$Username,
-        [string]$Password,
+        [System.Security.SecureString]$Password,
         [string]$Notes,
         
         [string]$Server,
@@ -155,7 +165,23 @@
                     {
                         if($PSBoundParameters.ContainsKey($CommonProp))
                         {
-                            $Val = $PSBoundParameters[$CommonProp]
+                            #Get value for this field... convert password to string
+                            if($CommonProp -eq "Password")
+                            {
+                                Try
+                                {
+                                    $Val = Convert-SecStrToStr -secstr $PSBoundParameters[$CommonProp] -ErrorAction stop
+                                }
+                                Catch
+                                {
+                                    Throw "$_"
+                                }
+                            }
+                            else
+                            {
+                                $Val = $PSBoundParameters[$CommonProp]
+                            }
+
                             if($Secret.Items.FieldName -contains $CommonProp)
                             {
                                 $Secret.Items | ForEach-Object {
@@ -175,11 +201,7 @@
                     }
         
                     $WebServiceProxy.UpdateSecret($Secret)
-
-
                 }
             }
-
-        
     }
 }
