@@ -1,7 +1,7 @@
 ﻿@{
 
 # Script module or binary module file associated with this manifest.
- RootModule = 'SecretServer.psm1'
+RootModule = 'SecretServer.psm1'
 
 # Version number of this module.
 ModuleVersion = '1.0'
@@ -40,7 +40,7 @@ PowerShellVersion = '3.0'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-# RequiredModules = @()
+RequiredModules = @('System.Web.Services.dll')
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
