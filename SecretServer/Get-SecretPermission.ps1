@@ -78,6 +78,12 @@
             }
         }
 
+        #Set up a type name an default properties
+        #This should be in the module def, but for simplicity of updates, here for now...
+            $TypeName = "SecretServer.SecretPermissions"
+            $defaultDisplaySet = echo SecretName Name DomainName View Edit Owner
+            Update-TypeData -TypeName $TypeName -DefaultDisplayPropertySet $defaultDisplaySet -Force
+
     }
     Process
     {
@@ -128,13 +134,9 @@
                         @{ label = "Edit";       expression = {$Permission.Edit} },
                         @{ label = "Owner";      expression = {$Permission.Owner} }
 
-                    #Provide a friendly type name and output
-                        $TypeName = "SecretServer.SecretPermissions"
+                    #Provide a friendly type name that will inherit the default properties
                         $Output.PSTypeNames.Insert(0,$TypeName)
-                        $defaultDisplaySet = echo SecretName Name DomainName View Edit Owner
-                        Update-TypeData -TypeName $TypeName -DefaultDisplayPropertySet $defaultDisplaySet -Force
-                    
-                    $Output
+                        $Output
                 } 
             }
         }

@@ -21,7 +21,12 @@
         Try
         {
             Write-Warning "Did not find config file $PSScriptRoot\SecretServer.xml, attempting to create"
-            [pscustomobject]@{Proxy = $null; Uri = $Null} | Export-Clixml -Path "$PSScriptRoot\SecretServer.xml" -Force -ErrorAction Stop
+            [pscustomobject]@{
+                Proxy = $null
+                Uri = $null
+                ServerInstance = $null
+                Database = $null
+            } | Export-Clixml -Path "$PSScriptRoot\SecretServer.xml" -Force -ErrorAction Stop
         }
         Catch
         {
