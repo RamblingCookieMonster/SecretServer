@@ -1,4 +1,4 @@
-Secret Server PowerShell Module
+﻿Secret Server PowerShell Module
 =============
 
 This is a PowerShell module for working with Thycotic Secret Server's web services.
@@ -10,7 +10,8 @@ This is a fast publish, there will be a number of changes.  Some caveats:
    * Limited testing, limited validation of edge case scenarios
    * Limited error handling
    * Limited comment based help and examples (some may be outdated)
-
+   * Limited explanation for functions relying on T-SQL.
+   
 #Functionality
 
 Search for secrets without triggering an audit:
@@ -41,6 +42,7 @@ Get connected:
  * You must enable Integrated Windows Authentication for Secret Server.  This may change.  See [product documentation](http://support.thycotic.com/kb/a90/setting-up-integrated-windows-authentication.aspx) for instructions.
  * We serialize a default Uri and proxy to SecretServerConfig.xml in the module path - you must have access to that path for this functionality
  * The account running these functions must have appropriate access to Secret Server
+ * For the T-SQL commands, I assume you can delegate privileges and create a secure way to invoke these.  Consider running these from a constrained, delegated endpoint to avoid unnecessary privileges in the Secret Server database.
  * Module folder downloaded, unblocked, extracted, available to import
 
 #Instructions
@@ -77,6 +79,10 @@ Get connected:
             UserName : My.Domain\SVC-WebCommander
             Password : System.Security.SecureString
         #>
+        
+    #List commands that directly hit the SQL database
+        Get-Command -Module SecretServer -ParameterName ServerInstance |
+            Where {$_.Name -notlike "*SecretServerConfig"}
         
 #Aside
 

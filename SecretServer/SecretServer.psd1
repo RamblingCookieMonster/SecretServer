@@ -19,7 +19,7 @@ CompanyName = ''
 # Copyright = '(c) 2014 ramblingcookiemonster. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Work with Secret Server Web Services'
+Description = 'Work with Secret Server Web Services and SQL Database'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '3.0'
@@ -85,4 +85,3 @@ AliasesToExport = '*'
 # DefaultCommandPrefix = ''
 
 }
-

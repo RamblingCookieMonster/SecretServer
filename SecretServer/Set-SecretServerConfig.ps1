@@ -14,6 +14,12 @@
     .PARAMETER Uri
         Specify a Uri to use
 
+    .PARAMETER ServerInstance
+        SQL Instance to query for commands that hit Secret Server database
+
+    .PARAMETER Database
+        SQL database to query for commands that hit Secret Server database
+
     .Example
         $Uri = 'https://SecretServer.Example/winauthwebservices/sswinauthwebservice.asmx'
 
@@ -30,7 +36,9 @@
     [cmdletbinding()]
     param(
         [System.Web.Services.Protocols.SoapHttpClientProtocol]$Proxy,
-        [string]$Uri
+        [string]$Uri,
+        [string]$ServerInstance,
+        [string]$Database
     )
 
     Try
@@ -42,13 +50,13 @@
         Throw "Error getting Secret Server config: $_"
     }
 
-    if($Proxy)
+    foreach($Key in $PSBoundParameters.Keys)
     {
-        $Existing.Proxy = $Proxy
-    }
-    If($Uri)
-    {
-        $Existing.Uri = $Uri
+        if(Get-Variable -name $Key)
+        {
+            #We use add-member force to cover cases where we add props to this config...
+            $Existing | Add-Member -MemberType NoteProperty -Name $Key -Value $PSBoundParameters.$Key -Force
+        }
     }
 
     #Write the global variable and the xml
