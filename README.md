@@ -32,6 +32,12 @@ Create new secrets:
 Change existing secrets:
   * ![Change existing secrets](/Media/Set-Secret.png)
 
+Find permissions for a secret:
+  * ![Find permissions for a secret](/Media/Get-SecretPermission.png)
+
+List secret audit activity:
+  * ![List secret audit activity](/Media/Get-SecretAudit.png)
+
 Get connected:
   * ![Get connected](/Media/GetConnected.png)
 
