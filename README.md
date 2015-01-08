@@ -1,17 +1,19 @@
 Secret Server PowerShell Module
 =============
 
-This is a PowerShell module for working with Thycotic Secret Server's web services.
+This is a PowerShell module for working with Thycotic Secret Server's web services.  If you use this module, check in every so often, there will be regular updates.
 
-This is a fast publish, there will be a number of changes.  Some caveats:
+This is a quick and dirty implementation based on my environment's configuration.  Contributions to improve this would be more than welcome!
+
+Some caveats:
 
  * We do not go out of the way to cover a variety of templates or customizations to templates.  Contributions welcome.  This is on my list but low priority.
  * A number of shortcuts have been taken given that this is a fast publish.  Addressing these is on my list.
    * Limited testing, limited validation of edge case scenarios
    * Limited error handling
    * Limited comment based help and examples (some may be outdated)
-   * Limited explanation for functions relying on T-SQL.
-   
+   * Limited explanation for configuring your environment to use functions that rely on T-SQL.
+
 #Functionality
 
 Search for secrets without triggering an audit:
@@ -37,6 +39,9 @@ Find permissions for a secret:
 
 List secret audit activity:
   * ![List secret audit activity](/Media/Get-SecretAudit.png)
+  
+Get Secret Activity directly from the database:
+  * ![Get Secret Activity directly from the database](/Media/Get-SecretActivity.png)
 
 Get connected:
   * ![Get connected](/Media/GetConnected.png)
