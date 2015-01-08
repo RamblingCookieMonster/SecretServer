@@ -9,9 +9,8 @@
 
         This command requires privileges on the Secret Server database.
         Given the sensitivity of this data, consider exposing this command through delegated constrained endpoints, perhaps through JitJea
-        Some properties are hidden by default, use Select-Object or Get-Member to explore.
     
-    .PARAMETER FolderPath, , , 
+    .PARAMETER FolderPath
         FolderPath to search for.  Accepts wildcards as * or %
 
     .PARAMETER InheritPermissions
@@ -101,11 +100,11 @@
         }
     }
 
+    $Where = $null
     if($JoinQuery.count -gt 0)
     {
         $Where = " AND $($JoinQuery -join " AND ")"
     }
-
 
     $Query = "
         SELECT	
@@ -128,16 +127,23 @@
 
 
 #common parameters for SQL queries
-    $params = @{
+    $SqlCmdParams = @{
         ServerInstance = $ServerInstance
         Database = $Database
-        Credential = $Credential
         As = 'PSObject'
         Query = $Query
-        SQLParameters = $SQLParameters
     }
 
-    Invoke-Sqlcmd2 @params | Foreach {
+    If($Credential)
+    {
+        $SqlCmdParams.Credential = $Credential
+    }
+    If($SQLParameters.Keys.Count -gt 0)
+    {
+        $SqlCmdParams.SQLParameters = $SQLParameters
+    }
+
+    Invoke-Sqlcmd2 @SqlCmdParams | Foreach {
         $Permissions = $_.Permissions -split "/"
         [pscustomobject]@{
             FolderPath = $_.FolderPath
