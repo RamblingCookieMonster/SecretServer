@@ -60,9 +60,10 @@
         [string]$UserId,
         [string]$DisplayName,
         [string]$EmailAddress,
-        [string][validateset("OR","AND")]$Join = "AND",
+
+        [string][validateset("OR","AND")]$LogicalJoin = "AND",
         [string[]]$DefaultProperties = @("UserId", "UserName", "DisplayName", "LastLogin", "Created", "Enabled", "EmailAddress"),
-        [System.Management.Automation.PSCredential]$Credential = $Cred2014,
+        [System.Management.Automation.PSCredential]$Credential,
         [string]$ServerInstance = $SecretServerConfig.ServerInstance,
         [string]$Database = $SecretServerConfig.Database
     )
@@ -94,7 +95,7 @@
 
     if($JoinQuery.count -gt 0)
     {
-        $UserQuery = "$UserQuery AND ( $($JoinQuery -join " $Join ") )"
+        $UserQuery = "$UserQuery AND ( $($JoinQuery -join " $LogicalJoin ") )"
     }
 
     Write-Verbose "Query:`n$($UserQuery | Out-String)`n`nSQLParams:`n$($SQLParameters | Out-String)"
