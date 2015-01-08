@@ -41,7 +41,7 @@
         SQL Database for Secret Server.  Defaults to $SecretServerConfig.Database
 
     .EXAMPLE
-        Get-SecretActivity -SecretName SQL-DB-2014* -Verbose -Action WebServiceView
+        Get-SecretActivity -SecretName SQL-DB-2014* -Action WebServiceView
 
         #Get Secret activity for secrets with name like SQL-DB-2014*, Showing only WebServiceView actions.  Use database and ServerInstance configured in $SecretServerConfig via Set-SecretServerConfig
 
@@ -112,36 +112,34 @@
             }
         }
 
-        if($JoinQuery.count -gt 0)
-        {
-            $Where = $JoinQuery -join " AND "
-        }
+        $Where = $JoinQuery -join " AND "
 
-    $Query = "
-		SELECT 
-			a.DateRecorded,
-			upn.DisplayName,
-            u.UserId,
-            u.UserName,
-			fp.FolderPath,
-			s.SecretName,
-			a.Action,
-			a.Notes,
-			a.IPAddress
-		FROM tbauditsecret a WITH (NOLOCK)
-			INNER JOIN tbuser u WITH (NOLOCK)
-				ON u.userid = a.userid
-				AND u.OrganizationId = 1
-			INNER JOIN vUserDisplayName upn WITH (NOLOCK)
-				ON u.UserId = upn.UserId
-			INNER JOIN tbsecret s WITH (NOLOCK)
-				ON s.secretid = a.secretid 
-			LEFT JOIN vFolderPath fp WITH (NOLOCK)
-				ON s.FolderId = fp.FolderId
-		WHERE $Where
-		ORDER BY 
-			1 DESC, 2, 3, 4, 5, 6, 7
-    "
+    #The query
+        $Query = "
+		    SELECT 
+			    a.DateRecorded,
+			    upn.DisplayName,
+                u.UserId,
+                u.UserName,
+			    fp.FolderPath,
+			    s.SecretName,
+			    a.Action,
+			    a.Notes,
+			    a.IPAddress
+		    FROM tbauditsecret a WITH (NOLOCK)
+			    INNER JOIN tbuser u WITH (NOLOCK)
+				    ON u.userid = a.userid
+				    AND u.OrganizationId = 1
+			    INNER JOIN vUserDisplayName upn WITH (NOLOCK)
+				    ON u.UserId = upn.UserId
+			    INNER JOIN tbsecret s WITH (NOLOCK)
+				    ON s.secretid = a.secretid 
+			    LEFT JOIN vFolderPath fp WITH (NOLOCK)
+				    ON s.FolderId = fp.FolderId
+		    WHERE $Where
+		    ORDER BY 
+			    1 DESC, 2, 3, 4, 5, 6, 7
+        "
 
     #Define Invoke-SqlCmd2 params
         $SqlCmdParams = @{
