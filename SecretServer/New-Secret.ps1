@@ -108,8 +108,7 @@
         [parameter(ParameterSetName = "WIN", Mandatory = $True )]
         [string]$Username,
 
-        [parameter( Mandatory = $True)]
-        [System.Security.SecureString]$Password,
+        [System.Security.SecureString]$Password = (Read-Host -AsSecureString -Prompt "Password for this secret:"),
         
         [string]$Notes,
 
