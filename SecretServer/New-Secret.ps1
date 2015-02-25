@@ -58,6 +58,11 @@
     .PARAMETER Uri
         Uri for your win auth web service.  Defaults to $SecretServerConfig.Uri.  Overridden by WebServiceProxy parameter
 
+    .PARAMETER Token
+        Token for your query.  If you do not use Windows authentication, you must request a token.
+
+        See Get-Help Get-SSToken
+
     .EXAMPLE
         New-Secret -SecretType 'Active Directory Account' -Domain Contoso.com -Username SQLServiceX -password $Credential.Password -notes "SQL Service account for SQLServerX\Instance" -FolderPath "*SQL Service"
 
@@ -127,24 +132,15 @@
 
         [string]$Uri = $SecretServerConfig.Uri,
 
-        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy
+        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy,
+
+        [string]$Token = $SecretServerConfig.Token
     )
 
     $RejectAll = $false
     $ConfirmAll = $false
 
-    if(-not $WebServiceProxy.whoami)
-    {
-        Write-Warning "Your SecretServerConfig proxy does not appear connected.  Creating new connection to $uri"
-        try
-        {
-            $WebServiceProxy = New-WebServiceProxy -uri $Uri -UseDefaultCredential -ErrorAction stop
-        }
-        catch
-        {
-            Throw "Error creating proxy for $Uri`: $_"
-        }
-    }
+    $WebServiceProxy = Verify-SecretConnection -Proxy $WebServiceProxy -Token $Token
 
     Write-Verbose "PSBoundParameters:`n$($PSBoundParameters | Out-String)`nParameterSetName: $($PSCmdlet.ParameterSetName)"
 

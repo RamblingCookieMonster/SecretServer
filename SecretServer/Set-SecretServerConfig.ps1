@@ -11,6 +11,8 @@
     .PARAMETER Proxy
         Specify a proxy to use
 
+        This is not stored in the XML
+
     .PARAMETER Uri
         Specify a Uri to use
 
@@ -19,6 +21,9 @@
 
     .PARAMETER Database
         SQL database to query for commands that hit Secret Server database
+
+    .PARAMETER Token
+        Specify a Token to use
 
     .Example
         $Uri = 'https://SecretServer.Example/winauthwebservices/sswinauthwebservice.asmx'
@@ -37,6 +42,7 @@
     param(
         [System.Web.Services.Protocols.SoapHttpClientProtocol]$Proxy,
         [string]$Uri,
+        [string]$Token,
         [string]$ServerInstance,
         [string]$Database
     )
@@ -61,6 +67,6 @@
 
     #Write the global variable and the xml
     $Global:SecretServerConfig = $Existing
-    $Existing | Export-Clixml -Path "$PSScriptRoot\SecretServer.xml" -force
+    $Existing | Select -Property * -ExcludeProperty Proxy | Export-Clixml -Path "$PSScriptRoot\SecretServer.xml" -force
 
 }

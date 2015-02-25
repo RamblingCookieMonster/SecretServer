@@ -9,6 +9,8 @@
 
         Default action updates $SecretServerConfig.Proxy which most functions use as a default
 
+        If you specify a winauthwebservices endpoint, we remove any existing Token from your module configuration.
+
     .PARAMETER Uri
         Uri to connect to.  Defaults to $SecretServerConfig.Uri
 
@@ -37,13 +39,23 @@
 
         [switch]$Passthru,
 
-        [bool]$UpdateSecretConfig = $true
+        [bool]$UpdateSecretConfig = $true,
+
+        [bool]$UseDefaultCredential = $True
     )
 
     #Windows Auth works.  Uses SOAP
         try
         {
-            $Proxy = New-WebServiceProxy -uri $Uri -UseDefaultCredential -ErrorAction stop
+            $Params = @{
+                uri = $Uri
+                ErrorAction = 'Stop'
+            }
+            If($UseDefaultCredential)
+            {
+                $Params.Add("UseDefaultCredential", $True)
+            }
+            $Proxy = New-WebServiceProxy @Params
         }
         catch
         {
@@ -57,14 +69,16 @@
 
         if($UpdateSecretConfig)
         {
-            Set-SecretServerConfig -Proxy $Proxy
             if(-not (Get-SecretServerConfig).Uri)
             {
-                Set-SecretServerConfig -Uri $Proxy.url
-                $SecretServerConfig.Uri = $Proxy.url
+                Set-SecretServerConfig -Uri $Uri
+                $SecretServerConfig.Uri = $Uri
             }
             $SecretServerConfig.Proxy = $Proxy
+            
+            if($Uri -match "winauthwebservices")
+            {
+                Set-SecretServerConfig -Token ""
+            }
         }
-
-
 }
