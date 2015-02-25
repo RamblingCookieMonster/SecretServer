@@ -22,8 +22,8 @@
         {
             Write-Warning "Did not find config file $PSScriptRoot\SecretServer.xml, attempting to create"
             [pscustomobject]@{
-                Proxy = $null
                 Uri = $null
+                Token = $null
                 ServerInstance = $null
                 Database = $null
             } | Export-Clixml -Path "$PSScriptRoot\SecretServer.xml" -Force -ErrorAction Stop
@@ -37,27 +37,14 @@
 #The config contains a serialized proxy, if one exists, not live.  Reconnect it
     Try
     {
-        #Import the config
+        #Import the config.  Clear out any legacy references to Proxy in the config file.
         $SecretServerConfig = $null
-        $SecretServerConfig = Get-SecretServerConfig -ErrorAction Stop
+        $SecretServerConfig = Get-SecretServerConfig -Source "ConfigFile" -ErrorAction Stop | Select -Property * -ExcludeProperty Proxy | Select -Property *, Proxy
 
-        #If a proxy is defined, create the proxy
-        $SSProxyUri = $SecretServerConfig.Proxy.url
         $SSUri = $SecretServerConfig.Uri
 
-        #Rehydrate the proxy, if one existed...
-        if($SSProxyUri)
-        {
-            try
-            {
-                $SecretServerConfig.Proxy = New-SSConnection -Uri $SSProxyUri -ErrorAction stop -Passthru
-            }
-            catch
-            {
-                Write-Warning "Error rehydrating proxy for '$SSProxyUri': $_"
-            }
-        }
-        elseif($SSUri)
+        #Connect to SSUri, if it exists
+        If($SSUri)
         {
             try
             {

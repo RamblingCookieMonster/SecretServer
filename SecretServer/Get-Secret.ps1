@@ -37,6 +37,11 @@
     .PARAMETER Uri
         Uri for your win auth web service.  Defaults to $SecretServerConfig.Uri.  Overridden by WebServiceProxy parameter
 
+    .PARAMETER Token
+        Token for your query.  If you do not use Windows authentication, you must request a token.
+
+        See Get-Help Get-SSToken
+
     .EXAMPLE
         Get-Secret
 
@@ -76,24 +81,16 @@
 
         [string]$Uri = $SecretServerConfig.Uri,
 
-        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy
+        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy,
+
+        [string]$Token = $SecretServerConfig.Token
 
     )
     Begin
     {
         Write-Verbose "Working with PSBoundParameters $($PSBoundParameters | Out-String)"
-        if(-not $WebServiceProxy.whoami)
-        {
-            Write-Warning "Your SecretServerConfig proxy does not appear connected.  Creating new connection to $uri"
-            try
-            {
-                $WebServiceProxy = New-WebServiceProxy -uri $Uri -UseDefaultCredential -ErrorAction stop
-            }
-            catch
-            {
-                Throw "Error creating proxy for $Uri`: $_"
-            }
-        }
+        $WebServiceProxy = Verify-SecretConnection -Proxy $WebServiceProxy -Token $Token
+
 
         #If the ID was specified, we need a way to go from secret template ID to secret template name...
         if($SecretId -and $As -ne "Raw")
@@ -107,7 +104,14 @@
         if(-not $SecretId)
         {
             #Find all passwords we have visibility to
-                $AllSecrets = @( $WebServiceProxy.SearchSecrets($SearchTerm,$IncludeDeleted,$IncludeRestricted).SecretSummaries )
+                if($Token)
+                {
+                    $AllSecrets = @( $WebServiceProxy.SearchSecrets($Token,$SearchTerm,$IncludeDeleted,$IncludeRestricted).SecretSummaries )
+                }
+                else
+                {
+                    $AllSecrets = @( $WebServiceProxy.SearchSecrets($SearchTerm,$IncludeDeleted,$IncludeRestricted).SecretSummaries )
+                }
         }
         else
         {
@@ -132,7 +136,15 @@
 
                     Try
                     {
-                        $SecretOutput = $WebServiceProxy.GetSecret($Secret.SecretId,$LoadSettingsAndPermissions, $null)
+                        if($Token)
+                        {
+                            $SecretOutput = $WebServiceProxy.GetSecret($Secret.SecretId,$LoadSettingsAndPermissions, $null)
+                        }
+                        else
+                        {
+                            $SecretOutput = $WebServiceProxy.GetSecret($Secret.SecretId,$LoadSettingsAndPermissions, $null)
+                        }
+
                         if($SecretOutput.Errors -and $SecretOutput.Errors.Count -gt 0)
                         {
                             Write-Error "Secret server returned error $($Secret.Errors | Out-String)"

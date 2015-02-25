@@ -10,8 +10,17 @@
         Secret Server
     #>
     [cmdletbinding()]
-    param()
+    param(
+        [ValidateSet("Variable","ConfigFile")]$Source = "Variable"
+    )
 
-    Import-Clixml -Path "$PSScriptRoot\SecretServer.xml"
+    if($Source -eq "Variable")
+    {
+        $SecretServerConfig
+    }
+    else
+    {
+        Import-Clixml -Path "$PSScriptRoot\SecretServer.xml"
+    }
 
 }
