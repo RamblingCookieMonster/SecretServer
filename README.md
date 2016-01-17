@@ -100,3 +100,5 @@ Get connected:
 On an aside, if you don't have a password management solution in place, definitely take a look at [Secret Server](http://thycotic.com/products/secret-server/compare-installed-editions/).
 
 I've been impressed with the product, documentation, and support.  It's one of those products that just works, and works well.  If you're a non-profit, you'll save a bit...
+
+Project Status, 1/17/2016: I no longer work with or have access to Secret Server. Feel free to fork this or use it as needed, but there will likely be no further development, barring external contributions.
