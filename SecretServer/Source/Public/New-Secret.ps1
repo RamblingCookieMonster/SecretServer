@@ -1,4 +1,4 @@
-﻿Function New-Secret
+﻿function New-Secret
 {
     <#
     .SYNOPSIS
@@ -274,7 +274,12 @@
 
                 try
                 {
-                    $Output = $WebServiceProxy.AddSecret($SecretTypeId, $SecretName, $Fields.Id, $FieldValues, $FolderId)
+                    if($Token){
+                        $Output = $WebServiceProxy.AddSecret($Token,$SecretTypeId, $SecretName, $Fields.Id, $FieldValues, $FolderId)
+                    }
+                    else{
+                        $Output = $WebServiceProxy.AddSecret($SecretTypeId, $SecretName, $Fields.Id, $FieldValues, $FolderId)
+                    }
 
                     if($Output.Secret)
                     {
@@ -293,3 +298,7 @@
             }
         }
 }
+
+#publish
+New-Alias -Name New-SSSecret -Value New-Secret -Force
+#endpublish

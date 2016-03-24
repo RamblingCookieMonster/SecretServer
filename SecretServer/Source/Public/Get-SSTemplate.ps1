@@ -1,4 +1,4 @@
-﻿Function Get-SSTemplate
+﻿function Get-SSTemplate
 {
     <#
     .SYNOPSIS
@@ -37,7 +37,8 @@
         [string]$Id = $null,
         [string]$Uri = $SecretServerConfig.Uri,
         [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy,
-        [switch]$Raw
+        [switch]$Raw,
+        [string]$Token = $SecretServerConfig.Token        
     )
 
     if(-not $WebServiceProxy.whoami)
@@ -54,7 +55,12 @@
     }
 
     #Find all templates, filter on name
-        $AllTemplates = @( $WebServiceProxy.GetSecretTemplates().SecretTemplates )
+        if($Token){
+            $AllTemplates = @( $WebServiceProxy.GetSecretTemplates($Token).SecretTemplates )
+        }
+        else{
+            $AllTemplates = @( $WebServiceProxy.GetSecretTemplates().SecretTemplates )
+        }
 
         if($Name)
         {

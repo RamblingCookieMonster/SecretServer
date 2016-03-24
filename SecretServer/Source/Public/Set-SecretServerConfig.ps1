@@ -1,4 +1,4 @@
-﻿Function Set-SecretServerConfig {
+﻿function Set-SecretServerConfig {
     <#
     .SYNOPSIS
         Set Secret Server module configuration.
@@ -67,6 +67,11 @@
 
     #Write the global variable and the xml
     $Global:SecretServerConfig = $Existing
-    $Existing | Select -Property * -ExcludeProperty Proxy | Export-Clixml -Path "$PSScriptRoot\SecretServer.xml" -force
+    $Existing | Select -Property * -ExcludeProperty Proxy | Export-Clixml -Path "$PSScriptRoot\SecretServer_$($env:USERNAME).xml" -force
 
 }
+
+#publish
+New-Alias -Name Set-SSSecretServerConfig -Value Set-SecretServerConfig -Force
+New-Alias -Name Set-SSConfig -Value Set-SecretServerConfig -Force
+#endpublish

@@ -1,4 +1,4 @@
-﻿Function Get-Secret
+﻿function Get-Secret
 {
     <#
     .SYNOPSIS
@@ -138,7 +138,7 @@
                     {
                         if($Token)
                         {
-                            $SecretOutput = $WebServiceProxy.GetSecret($Secret.SecretId,$LoadSettingsAndPermissions, $null)
+                            $SecretOutput = $WebServiceProxy.GetSecret($Token,$Secret.SecretId,$LoadSettingsAndPermissions, $null)
                         }
                         else
                         {
@@ -147,7 +147,7 @@
 
                         if($SecretOutput.Errors -and $SecretOutput.Errors.Count -gt 0)
                         {
-                            Write-Error "Secret server returned error $($Secret.Errors | Out-String)"
+                            Write-Error "Secret server returned error $($SecretOutput.Errors | Out-String)"
                             continue
                         }
                         $SecretDetail = $SecretOutput.Secret
@@ -243,3 +243,7 @@
         }
     }
 }
+
+#publish
+New-Alias -Name Get-SSSecret -Value Get-Secret -Force
+#endpublish

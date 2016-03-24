@@ -46,8 +46,9 @@
 
         [string]$Uri = $SecretServerConfig.Uri,
 
-        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy
+        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy,
 
+        [string]$Token = $SecretServerConfig.Token        
     )
     Begin
     {
@@ -66,7 +67,12 @@
         }
 
         #Find all templates, filter on name
-            $AllTemplates = @( $WebServiceProxy.GetSecretTemplates().SecretTemplates )
+            if($Token){
+                $AllTemplates = @( $WebServiceProxy.GetSecretTemplates($Token).SecretTemplates )
+            }
+            else{
+                $AllTemplates = @( $WebServiceProxy.GetSecretTemplates().SecretTemplates )
+            }
 
             if($Name)
             {

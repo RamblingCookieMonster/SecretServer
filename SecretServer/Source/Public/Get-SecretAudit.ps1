@@ -1,4 +1,4 @@
-﻿Function Get-SecretAudit
+﻿function Get-SecretAudit
 {
     <#
     .SYNOPSIS
@@ -48,7 +48,8 @@
         [int[]]$SecretId,
 
         [string]$Uri = $SecretServerConfig.Uri,
-        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy
+        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy,
+        [string]$Token = $SecretServerConfig.Token        
     )
     Begin
     {
@@ -70,7 +71,12 @@
         {
             [cmdletbinding()]
             param($id)
-            $result = $WebServiceProxy.GetSecretAudit($id)
+            if($Token){
+                $result = $WebServiceProxy.GetSecretAudit($Token,$id)
+            }
+            else{
+                $result = $WebServiceProxy.GetSecretAudit($id)
+            }
             if($result.Errors)
             {
                 Write-Error "Error obtaining Secret Audit for $id`:`n$($Result.Errors | Out-String)"
@@ -99,3 +105,7 @@
         }   
     }
 }
+
+#publish
+New-Alias -Name Get-SSSecretAudit -Value Get-SecretAudit -Force
+#endpublish

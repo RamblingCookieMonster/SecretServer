@@ -1,4 +1,4 @@
-﻿Function Get-SecretPermission
+﻿function Get-SecretPermission
 {
     <#
     .SYNOPSIS
@@ -59,7 +59,8 @@
 
         [string]$Uri = $SecretServerConfig.Uri,
 
-        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy
+        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy,
+        [string]$Token = $SecretServerConfig.Token        
 
     )
     Begin
@@ -143,3 +144,7 @@
 
     }
 }
+
+#publish
+New-Alias -Name Get-SSSecretPermission -Value Get-SecretPermission -Force
+#endpublish

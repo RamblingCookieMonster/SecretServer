@@ -1,4 +1,4 @@
-﻿Function New-SSToken
+﻿function New-SSToken
 {
     <#
     .SYNOPSIS

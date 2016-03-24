@@ -1,4 +1,4 @@
-﻿Function New-SSFolder
+﻿function New-SSFolder
 {
     <#
     .SYNOPSIS

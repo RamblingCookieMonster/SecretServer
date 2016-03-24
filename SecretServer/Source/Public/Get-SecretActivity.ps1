@@ -1,4 +1,4 @@
-﻿Function Get-SecretActivity
+﻿function Get-SecretActivity
 {
     <#
     .SYNOPSIS
@@ -162,3 +162,7 @@
 
     Invoke-Sqlcmd2 @SqlCmdParams
 }
+
+#publish
+New-Alias -Name Get-SSSecretActivity -Value Get-SecretActivity -Force
+#endpublish

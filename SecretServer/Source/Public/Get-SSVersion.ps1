@@ -1,4 +1,4 @@
-﻿Function Get-SSVersion
+﻿function Get-SSVersion
 {
     <#
     .SYNOPSIS
@@ -20,7 +20,8 @@
     [cmdletbinding()]
     param(
         [string]$Uri = $SecretServerConfig.Uri,
-        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy
+        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy,
+        [string]$Token = $SecretServerConfig.Token        
     )
     Begin
     {
@@ -40,7 +41,12 @@
     }
     Process
     {
-        $VersionResult = $WebServiceProxy.VersionGet()
+        if($Token){
+            $VersionResult = $WebServiceProxy.VersionGet($Token)
+        }
+        else{
+            $VersionResult = $WebServiceProxy.VersionGet()
+        }
         if ($VersionResult.Errors.Length -gt 0)
         {
             Throw "Secret Server reported an error while calling VersionGet."

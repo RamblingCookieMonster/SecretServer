@@ -1,4 +1,4 @@
-﻿Function New-SSConnection
+﻿function New-SSConnection
 {
     <#
     .SYNOPSIS

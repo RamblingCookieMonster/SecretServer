@@ -53,3 +53,8 @@
         $Secret
     }
 }
+
+#publish
+New-Alias -Name Copy-SecertServerPassword -Value Copy-SSPassword -Force
+New-Alias -Name Copy-SecertServerPass -Value Copy-SSPassword -Force
+#endpublish

@@ -1,4 +1,4 @@
-﻿Function Set-Secret
+﻿function Set-Secret
 {
     <#
     .SYNOPSIS
@@ -99,7 +99,8 @@
         [switch]$Force,
 
         [string]$Uri = $SecretServerConfig.Uri,
-        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy
+        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy,
+        [string]$Token = $SecretServerConfig.Token        
     )
     Begin
     {
@@ -123,7 +124,12 @@
     {
 
         #Find all passwords we have visibility to
-            $SecretSummary = @( $WebServiceProxy.SearchSecrets($SearchTerm,$false,$false).SecretSummaries)
+        if($Token){
+            $SecretSummary = @( $WebServiceProxy.SearchSecrets($Token,$SearchTerm,$false,$false).SecretSummaries)
+        }
+        else{
+            $SecretSummary = @( $WebServiceProxy.SearchSecrets($SearchTerm,$false,$false).SecretSummaries)   
+        }
 
             if($SecretId)
             {
@@ -205,3 +211,7 @@
             }
     }
 }
+
+#publish
+New-Alias -Name Set-SSSecret -Value Set-Secret -Force
+#endpublish

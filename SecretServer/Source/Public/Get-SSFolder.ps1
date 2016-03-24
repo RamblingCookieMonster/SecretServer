@@ -1,4 +1,4 @@
-﻿Function Get-SSFolder
+﻿function Get-SSFolder
 {
     <#
     .SYNOPSIS
@@ -37,7 +37,8 @@
         [string]$Id = '*',
         [string]$FolderPath = '*',
         [string]$Uri = $SecretServerConfig.Uri,
-        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy
+        [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy,
+        [string]$Token = $SecretServerConfig.Token        
     )
     
     if(-not $WebServiceProxy.whoami)
@@ -54,7 +55,12 @@
     }
     
     #Find all folders, filter on name.  We need all to build the folderpath tree
+    if($Token){
+        $Folders = @( $WebServiceProxy.SearchFolders($Token,$null).Folders )
+    }
+    else{
         $Folders = @( $WebServiceProxy.SearchFolders($null).Folders )
+    }
 
     #Loop through folders.  Get the full folder path
         foreach($Folder in $Folders)

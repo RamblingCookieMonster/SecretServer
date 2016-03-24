@@ -1,4 +1,4 @@
-﻿Function Get-SSGroupMembership
+﻿function Get-SSGroupMembership
 {
     <#
     .SYNOPSIS
