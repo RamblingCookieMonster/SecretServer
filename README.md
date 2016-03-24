@@ -19,7 +19,7 @@ Some caveats:
   * NEW: Connect-SecretServer Prompts you for credentials and includes support for connecting with RADIUS
   * NEW: Copy-SSPassword Using Get-Secret as the backend will prompt the user to select a specific secret and copy the password to the users clip board
   * UPDATE: Added use of Token when supplied or in the SecretServerConfig for all functions using Secret Server's web services
-  * UPDATE: Restructured the layout of the functions and used [Publish-Module](https://github.com/martin9700/Publish-Module) to build the module file for faster loading
+  * UPDATE: Restructured the layout of the functions and used [ConvertTo-Module](https://github.com/martin9700/ConvertTo-Module) to build the module file for faster loading
   * UPDATE: Made settings final include the current user name for use by multiple users
   * UPDATE: Moved file initialization into Get-SecretServerConfig
   * UPDATE: Moved proxy initialization into Connect-SecretServer
