@@ -14,6 +14,16 @@ Some caveats:
    * Limited comment based help and examples (some may be outdated)
    * Limited explanation for configuring your environment to use functions that rely on T-SQL.
 
+#UPDATES 03/24/2016 by Ryan Bushe
+
+  * NEW: Connect-SecretServer Prompts you for credentials and includes support for connecting with RADIUS
+  * NEW: Copy-SSPassword Using Get-Secret as the backend will prompt the user to select a specific secret and copy the password to the users clip board
+  * UPDATE: Added use of Token when supplied or in the SecretServerConfig for all functions using Secret Server's web services
+  * UPDATE: Restructured the layout of the functions and used [Publish-Module](https://github.com/martin9700/Publish-Module) to build the module file for faster loading
+  * UPDATE: Made settings final include the current user name for use by multiple users
+  * UPDATE: Moved file initialization into Get-SecretServerConfig
+  * UPDATE: Moved proxy initialization into Connect-SecretServer
+
 #Functionality
 
 Search for secrets without triggering an audit:
@@ -30,7 +40,7 @@ Find templates:
 
 Create new secrets:
   * ![Create new secrets](/Media/New-Secret.png)
-  
+
 Change existing secrets:
   * ![Change existing secrets](/Media/Set-Secret.png)
 
@@ -39,7 +49,7 @@ Find permissions for a secret:
 
 List secret audit activity:
   * ![List secret audit activity](/Media/Get-SecretAudit.png)
-  
+
 Get Secret Activity directly from the database:
   * ![Get Secret Activity directly from the database](/Media/Get-SecretActivity.png)
 
@@ -47,7 +57,7 @@ Get connected:
   * ![Get connected](/Media/GetConnected.png)
 
 #Prerequisites
-    
+
  * You must be using Windows PowerShell 3 or later on the system running this module
  * You must enable Secret Server Web Services ahead of time.  See [product documentation](http://thycotic.com/products/secret-server/support-2/) for instructions.
  * You must enable Integrated Windows Authentication for Secret Server.  This may change.  See [product documentation](http://support.thycotic.com/kb/a90/setting-up-integrated-windows-authentication.aspx) for instructions.
@@ -62,39 +72,39 @@ Get connected:
         #Download the repository
         #Unblock the zip file
         #Extract SecretServer folder to a module path (e.g. $env:USERPROFILE\Documents\WindowsPowerShell\Modules\)
-        
+
     #Each PowerShell session
         Import-Module SecretServer  #Alternatively, Import-Module "\\Path\To\SecretServer"
-        
+
     #List commands in the module
         Get-Command -Module SecretServer
-        
+
     #Get help for a command
         Get-Help New-SSConnection -Full
-        
+
     #Optional one time step: Set default Uri, create default proxy
         Set-SecretServerConfig -Uri https://FQDN.TO.SECRETSERVER/winauthwebservices/sswinauthwebservice.asmx
         New-SSConnection #Uses Uri we just set by default
-        
+
     #Get help for Get-Secret
         Get-Help Get-Secret -Full
-        
+
     #List a summary of all secrets
-        Get-Secret 
-        
+        Get-Secret
+
     #Convert stored secret to a credential object you can use in a variety of scenarios
         $Credential = (Get-Secret -SearchTerm SVC-WebCommander -as Credential ).Credential
         $Credential
-        
+
         <#
             UserName : My.Domain\SVC-WebCommander
             Password : System.Security.SecureString
         #>
-        
+
     #List commands that directly hit the SQL database
         Get-Command -Module SecretServer -ParameterName ServerInstance |
             Where {$_.Name -notlike "*SecretServerConfig"}
-        
+
 #Aside
 
 On an aside, if you don't have a password management solution in place, definitely take a look at [Secret Server](http://thycotic.com/products/secret-server/compare-installed-editions/).
