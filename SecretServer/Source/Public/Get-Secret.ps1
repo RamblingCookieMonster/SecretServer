@@ -56,18 +56,23 @@
         Secret Server
 
     #>
-    [cmdletbinding()]
+    [cmdletbinding(DefaultParameterSetName="Lookup")]
     param(
         [Parameter( Mandatory=$false,
+					ValueFromPipeline = $true,
                     ValueFromPipelineByPropertyName=$true,
                     ValueFromRemainingArguments=$false,
+					ParameterSetName="Search",
                     Position=0)]
         [string]$SearchTerm = $null,
 
         [Parameter( Mandatory=$false,
+					ValueFromPipeline = $true,
                     ValueFromPipelineByPropertyName=$true,
                     ValueFromRemainingArguments=$false,
-                    Position=1)]
+					ParameterSetName="Lookup",
+                    Position=0)]
+		[Alias("Id")]
         [int]$SecretId = $null,
 
         [validateset("Credential", "PlainText", "Raw", "Summary")]
