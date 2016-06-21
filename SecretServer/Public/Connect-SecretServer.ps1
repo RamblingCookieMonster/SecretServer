@@ -85,7 +85,6 @@
         }
         $Token = $Login.Token
         $Credentials = $null
-        Set-SecretServerConfig -Token $Token -Uri $Uri
     }
     else {
         $Login = $Proxy.Authenticate($Credentials.UserName, $Credentials.GetNetworkCredential().Password, $Organization, $Domain)
@@ -98,8 +97,8 @@
         }
         $Token = $Login.Token
         $Credentials = $null
-        Set-SecretServerConfig -Token $Token -Uri $Uri        
     }
+    Set-SecretServerConfig -Token $Token -Uri $Uri -Proxy $Proxy
 }
 
 #publish
