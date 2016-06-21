@@ -1,6 +1,6 @@
 ﻿#Get public and private function definition files.
-    $Public  = Get-ChildItem $PSScriptRoot\*.ps1 -ErrorAction SilentlyContinue 
-    $Private = Get-ChildItem $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue 
+    $Public  = Get-ChildItem $PSScriptRoot\Source\Public\*.ps1 -ErrorAction SilentlyContinue 
+    $Private = Get-ChildItem $PSScriptRoot\Source\Private\*.ps1 -ErrorAction SilentlyContinue 
 
 #Dot source the files
     Foreach($import in @($Public + $Private))
@@ -70,7 +70,12 @@
         if($Func -match "-Secret")
         {
             $FuncNew = $Func.Replace("-", "-SS")
-            New-Alias -Name $FuncNew -Value $Func -Force
+            New-Alias -Name $FuncNew -Value $Func
+        }
+        elseif($Func -match "-SS")
+        {
+            $FuncNew = $Func.Replace("-SS", "-Secret")
+            New-Alias -Name $FuncNew -Value $Func
         }
     }
 
