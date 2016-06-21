@@ -4,7 +4,7 @@
 RootModule = 'SecretServer.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.5'
+ModuleVersion = '1.6'
 
 # ID used to uniquely identify this module
 GUID = 'cd9cb7d9-e620-4d2c-ac68-a90ae27738f2'
