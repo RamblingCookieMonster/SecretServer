@@ -31,7 +31,7 @@
     .FUNCTIONALITY
         Secret Server
     #>
-    [cmdletbinding()]
+    [CmdletBinding()]
     param(
         [string]$Name = '*',
         [string]$Id = '*',
@@ -82,8 +82,5 @@
         }
         
     #Filter on the specified parameters
-        $Folders = $Folders | Where-Object {$_.FolderPath -like $FolderPath -and $_.Name -like $Name -and $_.Id -like $Id}
-
-    $Folders
-
+    $Folders | Where-Object {$_.FolderPath -like $FolderPath -and $_.Name -like $Name -and $_.Id -like $Id}
 }

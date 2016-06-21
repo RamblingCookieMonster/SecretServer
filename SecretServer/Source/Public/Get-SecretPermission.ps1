@@ -1,52 +1,49 @@
-﻿function Get-SecretPermission
-{
+﻿function Get-SecretPermission {
     <#
-    .SYNOPSIS
-        Get secret permissions from secret server
+        .SYNOPSIS
+            Get secret permissions from secret server
 
-    .DESCRIPTION
-        Get secret permissions from secret server.
+        .DESCRIPTION
+            Get secret permissions from secret server.
 
-        We return one object per access control entry.
-        Some properties are hidden by default, use Select-Object or Get-Member to explore.
-    
-    .PARAMETER SecretId
-        SecretId to search for.
+            We return one object per access control entry.
+            Some properties are hidden by default, use Select-Object or Get-Member to explore.
+        
+        .PARAMETER SecretId
+            SecretId to search for.
 
-    .PARAMETER IncludeDeleted
-        Include deleted secrets
+        .PARAMETER IncludeDeleted
+            Include deleted secrets
 
-    .PARAMETER IncludeRestricted
-        Include restricted secrets
+        .PARAMETER IncludeRestricted
+            Include restricted secrets
 
-    .PARAMETER WebServiceProxy
-        An existing Web Service proxy to use.  Defaults to $SecretServerConfig.Proxy
+        .PARAMETER WebServiceProxy
+            An existing Web Service proxy to use.  Defaults to $SecretServerConfig.Proxy
 
-    .PARAMETER Uri
-        Uri for your win auth web service.  Defaults to $SecretServerConfig.Uri.  Overridden by WebServiceProxy parameter
+        .PARAMETER Uri
+            Uri for your win auth web service.  Defaults to $SecretServerConfig.Uri.  Overridden by WebServiceProxy parameter
 
-    .EXAMPLE
-        Get-SecretPermission -Id 5
+        .EXAMPLE
+            Get-SecretPermission -Id 5
 
-        #Get Secret permissions for Secret ID 5
+            Get Secret permissions for Secret ID 5
 
-    .EXAMPLE
-        Get-Secret -SearchTerm "SVC-Webcommander" | Get-SecretPermission
+        .EXAMPLE
+            Get-Secret -SearchTerm "SVC-Webcommander" | Get-SecretPermission
 
-        # Get secret permissions for any results found by the SearchTerm 'SVC-WebCommander'
+            Get secret permissions for any results found by the SearchTerm 'SVC-WebCommander'
 
-    .EXAMPLE
-        Get-SecretPermission -Id 5 | Select -Property *
+        .EXAMPLE
+            Get-SecretPermission -Id 5 | Select -Property *
 
-        #Get Secret permissions for Secret ID 5, include all properties
+            Get Secret permissions for Secret ID 5, include all properties
 
-    .FUNCTIONALITY
-        Secret Server
-
+        .FUNCTIONALITY
+            Secret Server
     #>
-    [cmdletbinding()]
+    [CmdletBinding()]
     param(
-
         [Parameter( Mandatory=$false,
                     ValueFromPipelineByPropertyName=$true,
                     ValueFromRemainingArguments=$false,
@@ -63,18 +60,14 @@
         [string]$Token = $SecretServerConfig.Token        
 
     )
-    Begin
-    {
+    begin {
         Write-Verbose "Working with PSBoundParameters $($PSBoundParameters | Out-String)"
-        if(-not $WebServiceProxy.whoami)
-        {
+        if(-not $WebServiceProxy.whoami) {
             Write-Warning "Your SecretServerConfig proxy does not appear connected.  Creating new connection to $uri"
-            try
-            {
+            try {
                 $WebServiceProxy = New-WebServiceProxy -uri $Uri -UseDefaultCredential -ErrorAction stop
             }
-            catch
-            {
+            catch {
                 Throw "Error creating proxy for $Uri`: $_"
             }
         }
@@ -86,28 +79,22 @@
             Update-TypeData -TypeName $TypeName -DefaultDisplayPropertySet $defaultDisplaySet -Force
 
     }
-    Process
-    {
-        foreach($Id in $SecretId)
-        {
-            Try
-            {
+    process {
+        foreach($Id in $SecretId) {
+            try {
                 #If we don't remove this key, it is bound to Get-Secret below...
-                if($PSBoundParameters.ContainsKey('SecretId'))
-                {
+                if($PSBoundParameters.ContainsKey('SecretId')) {
                     $PSBoundParameters.Remove('SecretId') | Out-Null
                 }
 
                 $Raw = Get-Secret @PSBoundParameters -As Raw -LoadSettingsAndPermissions -ErrorAction Stop -SecretId $Id
             }
-            Catch
-            {
+            catch {
                 Write-Error "Error obtaining permissions for secret id '$id':`n$_"
-                Continue
+                continue
             }
 
-            if($Raw)
-            {
+            if($Raw) {
 
                 #Get some initial data...
                 $init = [pscustomobject]@{
@@ -123,8 +110,7 @@
 
                 #Now loop through each ACE, merge initial data with ACE data
                 $Permissions = $Raw.SecretPermissions.Permissions
-                foreach($Permission in $Permissions)
-                {
+                foreach($Permission in $Permissions) {
                     $Output = $init | Select -Property *, 
                         @{ label = "Name";       expression = {$Permission.UserOrGroup.Name} },
                         @{ label = "DomainName"; expression = {$Permission.UserOrGroup.DomainName} },
@@ -141,7 +127,6 @@
                 } 
             }
         }
-
     }
 }
 

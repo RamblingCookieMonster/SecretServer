@@ -1,62 +1,61 @@
-﻿function Get-Secret
-{
+﻿function Get-Secret {
     <#
-    .SYNOPSIS
-        Get details on secrets from secret server
+        .SYNOPSIS
+            Get details on secrets from secret server
 
-    .DESCRIPTION
-        Get details on secrets from secret server.
+        .DESCRIPTION
+            Get details on secrets from secret server.
 
-        Depending on your configuration, the search will generally include other fields (e.g. Notes).
-        For this reason, we do not strip out results based on the search term, we leave this to the end user.
+            Depending on your configuration, the search will generally include other fields (e.g. Notes).
+            For this reason, we do not strip out results based on the search term, we leave this to the end user.
 
-    .PARAMETER SearchTerm
-        String to search for.  Accepts wildcards as '*'.
+        .PARAMETER SearchTerm
+            String to search for.  Accepts wildcards as '*'.
 
-    .PARAMETER SecretId
-        SecretId to search for.
+        .PARAMETER SecretId
+            SecretId to search for.
 
-    .PARAMETER As
-        Summary (Default)  Do not return secret details, only return the secret summary.  No audit event triggered
-        Credential         Build credential from stored domain (optional), username, password
-        PlainText          Return password in ***plain text***
-        Raw                Return raw 'secret' object, with settings and permiss
+        .PARAMETER As
+            Summary (Default)  Do not return secret details, only return the secret summary.  No audit event triggered
+            Credential         Build credential from stored domain (optional), username, password
+            PlainText          Return password in ***plain text***
+            Raw                Return raw 'secret' object, with settings and permiss
+            
+        .PARAMETER LoadSettingsAndPermissions
+            Load permissions and settings for each secret.  Only applicable for Raw output.
         
-    .PARAMETER LoadSettingsAndPermissions
-        Load permissions and settings for each secret.  Only applicable for Raw output.
-    
-    .PARAMETER IncludeDeleted
-        Include deleted secrets
+        .PARAMETER IncludeDeleted
+            Include deleted secrets
 
-    .PARAMETER IncludeRestricted
-        Include restricted secrets
+        .PARAMETER IncludeRestricted
+            Include restricted secrets
 
-    .PARAMETER WebServiceProxy
-        An existing Web Service proxy to use.  Defaults to $SecretServerConfig.Proxy
+        .PARAMETER WebServiceProxy
+            An existing Web Service proxy to use.  Defaults to $SecretServerConfig.Proxy
 
-    .PARAMETER Uri
-        Uri for your win auth web service.  Defaults to $SecretServerConfig.Uri.  Overridden by WebServiceProxy parameter
+        .PARAMETER Uri
+            Uri for your win auth web service.  Defaults to $SecretServerConfig.Uri.  Overridden by WebServiceProxy parameter
 
-    .PARAMETER Token
-        Token for your query.  If you do not use Windows authentication, you must request a token.
+        .PARAMETER Token
+            Token for your query.  If you do not use Windows authentication, you must request a token.
 
-        See Get-Help Get-SSToken
+            See Get-Help Get-SSToken
 
-    .EXAMPLE
-        Get-Secret
+        .EXAMPLE
+            Get-Secret
 
-        #View a summary of all secrets your session account has access to
+            #View a summary of all secrets your session account has access to
 
-    .EXAMPLE
-        $Credential = ( Get-Secret -SearchTerm "SVC-RemedyProd" -As Credential ).Credential
+        .EXAMPLE
+            $Credential = ( Get-Secret -SearchTerm "SVC-RemedyProd" -As Credential ).Credential
 
-        # Get secret data for SVC-RemedyProd as a credential object, store it for later use
+            # Get secret data for SVC-RemedyProd as a credential object, store it for later use
 
-    .FUNCTIONALITY
-        Secret Server
+        .FUNCTIONALITY
+            Secret Server
 
     #>
-    [cmdletbinding(DefaultParameterSetName="Lookup")]
+    [CmdletBinding(DefaultParameterSetName="Lookup")]
     param(
         [Parameter( Mandatory=$false,
 					ValueFromPipeline = $true,
@@ -91,8 +90,7 @@
         [string]$Token = $SecretServerConfig.Token
 
     )
-    Begin
-    {
+    begin {
         Write-Verbose "Working with PSBoundParameters $($PSBoundParameters | Out-String)"
         $WebServiceProxy = Verify-SecretConnection -Proxy $WebServiceProxy -Token $Token
 
@@ -103,72 +101,56 @@
             $TemplateTable = Get-TemplateTable
         }
     }
-    Process
-    {
+    process {
 
-        if(-not $SecretId)
-        {
+        if(-not $SecretId) {
             #Find all passwords we have visibility to
-                if($Token)
-                {
+                if($Token) {
                     $AllSecrets = @( $WebServiceProxy.SearchSecrets($Token,$SearchTerm,$IncludeDeleted,$IncludeRestricted).SecretSummaries )
                 }
-                else
-                {
+                else {
                     $AllSecrets = @( $WebServiceProxy.SearchSecrets($SearchTerm,$IncludeDeleted,$IncludeRestricted).SecretSummaries )
                 }
         }
-        else
-        {
+        else {
             #If IDs were specified, create objects with a SecretId we will pull
             $AllSecrets = $SecretId | ForEach-Object {[pscustomobject]@{SecretId = $_}}
         }
 
         #Return summaries, if we didn't request more...
-        if($As -like "Summary")
-        {
-            if($SecretId)
-            {
+        if($As -like "Summary") {
+            if($SecretId) {
                 Write-Warning "To see more than the SecretId, use -As Raw, Credential, or Plaintext when getting a secret based on SecretId"
             }
             $AllSecrets
         }
-        else
-        {
+        else {
             #Extract the secrets
-                foreach($Secret in $AllSecrets)
-                {
+                foreach($Secret in $AllSecrets) {
 
-                    Try
-                    {
-                        if($Token)
-                        {
+                    try {
+                        if($Token) {
                             $SecretOutput = $WebServiceProxy.GetSecret($Token,$Secret.SecretId,$LoadSettingsAndPermissions, $null)
                         }
-                        else
-                        {
+                        else {
                             $SecretOutput = $WebServiceProxy.GetSecret($Secret.SecretId,$LoadSettingsAndPermissions, $null)
                         }
 
-                        if($SecretOutput.Errors -and $SecretOutput.Errors.Count -gt 0)
-                        {
+                        if($SecretOutput.Errors -and $SecretOutput.Errors.Count -gt 0) {
                             Write-Error "Secret server returned error $($SecretOutput.Errors | Out-String)"
                             continue
                         }
                         $SecretDetail = $SecretOutput.Secret
                     }
-                    Catch
-                    {
+                    catch {
                         Write-Error "Error retrieving secret $($Secret | Out-String)"
                         continue
                     }
 
-                    if($As -like "Raw")
-                    {
+                    if($As -like "Raw") {
                         $SecretDetail
                     }
-                    else
-                    {
+                    else {
                         #Start building up output
                         $Hash = [ordered]@{
                             SecretId = $Secret.SecretId
@@ -178,8 +160,7 @@
                         }
 
                         #If we obtained by Id, we don't have the same fields above... get them from SecretDetail
-                        if($SecretId)
-                        {
+                        if($SecretId) {
                             $SecretTypeId = $SecretDetail.SecretTypeId
                             $Hash.SecretId = $SecretDetail.Id
                             $Hash.SecretType = $TemplateTable.$SecretTypeId
@@ -187,62 +168,49 @@
                         }
 
                         #Items contains a collection of properties about the secret that can change based on the type of secret
-                            foreach($Item in $SecretDetail.Items)
-                            {
+                            foreach($Item in $SecretDetail.Items) {
                                 #If they want the credential, we convert to a secure string
-                                if($Item.IsPassword -and $As -notlike "PlainText")
-                                {
-                                    if($Item.Value.Length -and $Item.Value.Length -notlike 0)
-                                    {
+                                if($Item.IsPassword -and $As -notlike "PlainText") {
+                                    if($Item.Value.Length -and $Item.Value.Length -notlike 0) {
                                         $password = $Item.Value | ConvertTo-SecureString -asPlainText -Force
                                     }
-                                    else
-                                    {
+                                    else {
                                         $password = "Could not access password"
                                     }
                                     $Hash.Add($Item.FieldName, $password)
                                 }
-                                else
-                                {
+                                else {
                                     $Hash.Add($Item.FieldName, $Item.Value)
                                 }
                             }
 
                         #If they want a credential, compose the username, create the credential
-                        if($As -like "Credential" -and $Hash.Contains("Password") -and $Hash.Contains("Username"))
-                        {
-                            if($Hash.Domain)
-                            {
+                        if($As -like "Credential" -and $Hash.Contains("Password") -and $Hash.Contains("Username")) {
+                            if($Hash.Domain) {
                                 $User = $Hash.Domain, $Hash.Username -join "\"
                             }
-                            elseif($Hash.Machine)
-                            {
+                            elseif($Hash.Machine){
                                 $User = $Hash.Machine, $Hash.Username -join "\"
                             }
-                            else
-                            {
-                                if($Hash.Username -notlike "")
-                                {
+                            else {
+                                if($Hash.Username -notlike "") {
                                     $User = $Hash.Username
                                 }
-                                else
-                                {
+                                else {
                                     $User = "NONE"
                                 }
                             }
 
-                            if($Password -notlike "Could not access password")
-                            {
+                            if($Password -notlike "Could not access password") {
                                 $Hash.Credential = New-Object System.Management.Automation.PSCredential($user,$password)
                             }
-                            else
-                            {
+                            else {
                                 $Hash.Credential = $password
                             }
                         }
 
                         #Output
-                            [pscustomobject]$Hash
+                        [pscustomobject]$Hash
                     }
                 }
         }

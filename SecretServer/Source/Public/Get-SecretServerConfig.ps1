@@ -1,23 +1,21 @@
-﻿Function Get-SecretServerConfig {
+﻿function Get-SecretServerConfig {
     <#
-    .SYNOPSIS
-        Get Secret Server module configuration.
+        .SYNOPSIS
+            Get Secret Server module configuration.
 
-    .DESCRIPTION
-        Get Secret Server module configuration
+        .DESCRIPTION
+            Get Secret Server module configuration
 
-    .FUNCTIONALITY
-        Secret Server
+        .FUNCTIONALITY
+            Secret Server
     #>
-    [cmdletbinding()]
+    [CmdletBinding()]
     param(
         [ValidateSet("Variable","ConfigFile")]$Source = "Variable"
     )
 
-    if(-not (Test-Path -Path "$PSScriptRoot\SecretServer_$($env:USERNAME).xml" -ErrorAction SilentlyContinue))
-    {
-        Try
-        {
+    if(-not (Test-Path -Path "$PSScriptRoot\SecretServer_$($env:USERNAME).xml" -ErrorAction SilentlyContinue)) {
+        try {
             Write-Verbose "Did not find config file $PSScriptRoot\SecretServer_$($env:USERNAME).xml attempting to create"
             [pscustomobject]@{
                 Uri = $null
@@ -26,21 +24,17 @@
                 Database = $null
             } | Export-Clixml -Path "$PSScriptRoot\SecretServer_$($env:USERNAME).xml" -Force -ErrorAction Stop
         }
-        Catch
-        {
+        catch {
             Write-Warning "Failed to create config file $PSScriptRoot\SecretServer_$($env:USERNAME).xml: $_"
         }
     }    
 
-    if($Source -eq "Variable" -and $SecretServerConfig)
-    {
+    if($Source -eq "Variable" -and $SecretServerConfig) {
         $SecretServerConfig
     }
-    else
-    {
+    else {
         Import-Clixml -Path "$PSScriptRoot\SecretServer_$($env:USERNAME).xml"
     }
-
 }
 
 #publish
