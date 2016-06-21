@@ -185,7 +185,7 @@
                             foreach($Item in $SecretDetail.Items)
                             {
                                 #If they want the credential, we convert to a secure string
-                                if($Item.FieldName -like "Password" -and $As -notlike "PlainText")
+                                if($Item.IsPassword -and $As -notlike "PlainText")
                                 {
                                     if($Item.Value.Length -and $Item.Value.Length -notlike 0)
                                     {
