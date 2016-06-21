@@ -76,7 +76,7 @@
         [int]$SecretId = $null,
 
         [validateset("Credential", "PlainText", "Raw", "Summary")]
-        [string]$As = "Summary",
+        [string]$As = $(if($SecretId) {"Raw"}else{"Summary"}),
 
         [switch]$LoadSettingsAndPermissions,
 
@@ -98,7 +98,7 @@
 
 
         #If the ID was specified, we need a way to go from secret template ID to secret template name...
-        if($SecretId -and $As -ne "Raw")
+        if($SecretId -or $As -eq "Raw")
         {
             $TemplateTable = Get-TemplateTable
         }
@@ -121,7 +121,7 @@
         else
         {
             #If IDs were specified, create objects with a SecretId we will pull
-                $AllSecrets = $SecretId | ForEach-Object {[pscustomobject]@{SecretId = $_}}
+            $AllSecrets = $SecretId | ForEach-Object {[pscustomobject]@{SecretId = $_}}
         }
 
         #Return summaries, if we didn't request more...
