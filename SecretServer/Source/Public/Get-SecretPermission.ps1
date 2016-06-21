@@ -72,17 +72,17 @@
             }
         }
 
-        #Set up a type name an default properties
-        #This should be in the module def, but for simplicity of updates, here for now...
-            $TypeName = "SecretServer.SecretPermissions"
-            $defaultDisplaySet = echo SecretName Name DomainName View Edit Owner
-            Update-TypeData -TypeName $TypeName -DefaultDisplayPropertySet $defaultDisplaySet -Force
+        # Set up a type name an default properties
+        # This should be in the module def, but for simplicity of updates, here for now...
+        $TypeName = "SecretServer.SecretPermissions"
+        $defaultDisplaySet = echo SecretName Name DomainName View Edit Owner
+        Update-TypeData -TypeName $TypeName -DefaultDisplayPropertySet $defaultDisplaySet -Force
 
     }
     process {
         foreach($Id in $SecretId) {
             try {
-                #If we don't remove this key, it is bound to Get-Secret below...
+                # If we don't remove this key, it is bound to Get-Secret below...
                 if($PSBoundParameters.ContainsKey('SecretId')) {
                     $PSBoundParameters.Remove('SecretId') | Out-Null
                 }
@@ -96,7 +96,7 @@
 
             if($Raw) {
 
-                #Get some initial data...
+                # Get some initial data...
                 $init = [pscustomobject]@{
                     SecretName = $Raw.Name
                     SecretId = $Raw.Id
@@ -108,7 +108,7 @@
                     IsChangeToPermissions = $Raw.SecretPermissions.IsChangeToPermissions
                 }
 
-                #Now loop through each ACE, merge initial data with ACE data
+                # Now loop through each ACE, merge initial data with ACE data
                 $Permissions = $Raw.SecretPermissions.Permissions
                 foreach($Permission in $Permissions) {
                     $Output = $init | Select -Property *, 
@@ -122,8 +122,8 @@
                         @{ label = "Owner";      expression = {$Permission.Owner} }
 
                     #Provide a friendly type name that will inherit the default properties
-                        $Output.PSTypeNames.Insert(0,$TypeName)
-                        $Output
+                    $Output.PSTypeNames.Insert(0,$TypeName)
+                    $Output
                 } 
             }
         }

@@ -51,7 +51,7 @@
             #Show UserId and DisplayName for users with a displayname like %monster%
 
         .FUNCTIONALITY
-            Secret Server
+            Secret Server DBQuery
     #>
     [CmdletBinding()]
     param(

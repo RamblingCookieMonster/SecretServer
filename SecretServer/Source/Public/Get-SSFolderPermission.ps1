@@ -42,7 +42,7 @@
             Show Folder Permissions to any folder with path matching 'High Privilege'
 
         .FUNCTIONALITY
-            Secret Server
+            Secret Server DBQuery
     #>
     [CmdletBinding()]
     param(
@@ -142,6 +142,7 @@
     Invoke-Sqlcmd2 @SqlCmdParams | ForEach {
         $Permissions = $_.Permissions -split "/"
         [pscustomobject]@{
+            PSTypeName = "SecretServer.FolderPermissions"
             FolderPath = $_.FolderPath
             InheritPermissions = $_.InheritPermissions
             Principal = $_.Principal

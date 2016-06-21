@@ -48,7 +48,7 @@
             #Get users in group 3, list the UserName only
 
         .FUNCTIONALITY
-            Secret Server
+            Secret Server DBQuery
     #>
     [CmdletBinding()]
     param(
@@ -132,5 +132,10 @@
     # Give some final verbose output
     Write-Verbose "Query:`n$($Query | Out-String)`n`SQlParameters:`n$($SQlParameters | Out-String)"
 
-    Invoke-Sqlcmd2 @SqlCmdParams
+    $Results = @(Invoke-Sqlcmd2 @SqlCmdParams)
+    foreach($Result in $Results) {
+        #Provide a friendly type name that will inherit the default properties
+        $Result.PSTypeNames.Insert(0,"SecretServer.GroupMembership")
+        $Result
+    }
 }

@@ -34,10 +34,16 @@
     [CmdletBinding()]
     param(
         [string]$Name = '*',
+
         [string]$Id = '*',
+
+        [Alias("Path")]
         [string]$FolderPath = '*',
+
         [string]$Uri = $SecretServerConfig.Uri,
+
         [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy,
+        
         [string]$Token = $SecretServerConfig.Token        
     )
     
@@ -63,24 +69,24 @@
     }
 
     #Loop through folders.  Get the full folder path
-        foreach($Folder in $Folders)
-        {
-            $FolderName = $Folder.Name
-            $FolderId = $Folder.Id
-            $ParentId = $Folder.ParentFolderId
-            $FullPath = "$FolderName"
-            While($ParentID -notlike -1)
-            {
-                $WorkingFolder = $Folders | Where-Object {$_.Id -like $ParentId}
-                $WorkingFolderName = $WorkingFolder.Name
-                
-                $FullPath = $WorkingFolderName, $FullPath -join "\"
-
-                $ParentID = $WorkingFolder.ParentFolderId
-            }
-            $Folder | Add-Member -MemberType NoteProperty -Name "FolderPath" -Value $FullPath -force
+    foreach($Folder in $Folders) {
+        if($Folder.Name -notlike $Name -or $Folder.Id -notlike $Id) {
+            continue
         }
-        
-    #Filter on the specified parameters
-    $Folders | Where-Object {$_.FolderPath -like $FolderPath -and $_.Name -like $Name -and $_.Id -like $Id}
+        $Folder = New-Object PSObject $Folder
+        $Folder.PSTypeNames.Insert(0,"SecretServer.Folder")
+
+        $FolderName = $Folder.Name
+        $ParentId = $Folder.ParentFolderId
+        $FullPath = "$FolderName"
+        while($ParentID -notlike -1) {
+            $WorkingFolder = $Folders | Where-Object {$_.Id -eq $ParentId}
+            $FullPath = $WorkingFolder.Name, $FullPath -join "\"
+            $ParentID = $WorkingFolder.ParentFolderId
+        }
+        if($FullPath -notlike $FolderPath) {
+            continue
+        }
+        $Folder | Add-Member -MemberType NoteProperty -Name "FolderPath" -Value $FullPath -force -PassThru
+    }
 }

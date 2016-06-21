@@ -153,6 +153,7 @@
                     else {
                         #Start building up output
                         $Hash = [ordered]@{
+                            PSTypeName = "SecretServer.Secret"
                             SecretId = $Secret.SecretId
                             SecretType = $Secret.SecretTypeName
                             SecretName = $Secret.SecretName

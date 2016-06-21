@@ -71,6 +71,8 @@
             else {
                 $result = $WebServiceProxy.GetSecretAudit($id)
             }
+
+            $result.PSTypeNames.Insert(0,"SecretServer.SecretAudit")
             if($result.Errors) {
                 Write-Error "Error obtaining Secret Audit for $id`:`n$($Result.Errors | Out-String)"
             }

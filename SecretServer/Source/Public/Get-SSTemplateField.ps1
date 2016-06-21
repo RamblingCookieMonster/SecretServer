@@ -82,6 +82,7 @@
             $AllTemplates | where {$_.Id -like $TemplateID} | ForEach-Object {
                 foreach($Field in $_.Fields) {
                     [pscustomobject]@{
+                        PSTypeName = "SecretServer.TemplateField"
                         TemplateId = $_.ID
                         TemplateName = $_.Name
                         DisplayName = $Field.DisplayName

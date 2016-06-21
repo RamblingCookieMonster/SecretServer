@@ -80,6 +80,7 @@
         foreach($Template in $AllTemplates) {
             #Start building up output
             [pscustomobject]@{
+                PSTypeName = "SecretServer.Template"
                 ID = $Template.Id
                 Name = $Template.Name
                 Fields = $Template.Fields
