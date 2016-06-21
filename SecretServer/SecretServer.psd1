@@ -58,13 +58,13 @@ PowerShellVersion = '3.0'
 # NestedModules = @()
 
 # Functions to export from this module
-FunctionsToExport = '*'
+FunctionsToExport = @('Connect-SecretServer','Copy-SSPassword','Get-Secret','Get-SecretActivity','Get-SecretAudit','Get-SecretPermission','Get-SecretServerConfig','Get-SSFolder','Get-SSFolderPermission','Get-SSGroupMembership','Get-SSTemplate','Get-SSTemplateField','Get-SSUser','Get-SSVersion','New-Secret','New-SSConnection','New-SSFolder','New-SSToken','Set-Secret','Set-SecretServerConfig')
 
 # Cmdlets to export from this module
-CmdletsToExport = '*'
+# CmdletsToExport = '*'
 
 # Variables to export from this module
-VariablesToExport = '*'
+VariablesToExport = 'SecretServerConfig'
 
 # Aliases to export from this module
 AliasesToExport = '*'
@@ -85,3 +85,4 @@ AliasesToExport = '*'
 # DefaultCommandPrefix = ''
 
 }
+
