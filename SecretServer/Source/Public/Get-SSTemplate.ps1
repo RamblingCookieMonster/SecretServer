@@ -88,11 +88,11 @@
             foreach($Template in $AllTemplates)
             {
                 #Start building up output
-                    [pscustomobject]@{
-                        ID = $Template.Id
-                        Name = $Template.Name
-                        Fields = $Template.Fields.Displayname -Join ", "
-                    }
+					[pscustomobject]@{
+						ID = $Template.Id
+						Name = $Template.Name
+						Fields = $Template.Fields
+					}
             }
         }
 }
