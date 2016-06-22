@@ -1,3 +1,4 @@
+#requires -Module Configuration
 [CmdletBinding()]
 param(
     [Alias("PSPath")]
