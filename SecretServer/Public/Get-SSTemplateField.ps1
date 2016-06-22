@@ -38,7 +38,7 @@
                     ValueFromPipelineByPropertyName=$true, 
                     ValueFromRemainingArguments=$false, 
                     Position=0)]
-        [String]$Id = '*',
+        [String]$Id = $null,
 
         [string[]]$Name = $null,
 
@@ -61,11 +61,18 @@
 
         #Find all templates, filter on name
         if($Token) {
-            $AllTemplates = @( $WebServiceProxy.GetSecretTemplates($Token).SecretTemplates )
+            $AllTemplates = @( $WebServiceProxy.GetSecretTemplates($Token) )
         }
         else {
-            $AllTemplates = @( $WebServiceProxy.GetSecretTemplates().SecretTemplates )
+            $AllTemplates = @( $WebServiceProxy.GetSecretTemplates() )
         }
+        Write-Verbose "Found $($AllTemplates.Count) templates"
+
+        if($AllTemplates.Errors -and $AllTemplates.Errors.Count -gt 0) {
+            Write-Error "Secret server returned error $($AllTemplates.Errors | Out-String)"
+            return
+        }
+        $AllTemplates = $AllTemplates.SecretTemplates
 
         if($Name) {
             $AllTemplates = $AllTemplates | ForEach-Object {
@@ -75,23 +82,28 @@
                 }
             }
         }
+        Write-Verbose "Filtered for name to $($AllTemplates.Count) templates"
+
+        if($Id) {
+            $AllTemplates  = $AllTemplates | Where-Object {$_.Id -like $Id}
+        }
+        Write-Verbose "Filtered for id to $($AllTemplates.Count) templates"        
     }
     process {
-        Write-Verbose "Working on ID $ID"
-        foreach($TemplateID in $ID) {
-            $AllTemplates | where {$_.Id -like $TemplateID} | ForEach-Object {
-                foreach($Field in $_.Fields) {
-                    [pscustomobject]@{
-                        PSTypeName = "SecretServer.TemplateField"
-                        TemplateId = $_.ID
-                        TemplateName = $_.Name
-                        DisplayName = $Field.DisplayName
-                        Id = $Field.Id
-                        IsPassword = $Field.IsPassword
-                        IsUrl = $Field.IsUrl
-                        IsNotes = $Field.IsNotes
-                        IsFile = $Field.IsFile
-                    }
+        Write-Verbose "Searching for Name='$Name', ID='$ID' found $($AllTemplates.Count) templates"
+        foreach($Template in $AllTemplates) {
+            Write-Verbose "Working on ID $($Template.ID)"
+            foreach($Field in $Template.Fields) {
+                [pscustomobject]@{
+                    PSTypeName = "SecretServer.TemplateField"
+                    TemplateId = $Template.ID
+                    TemplateName = $Template.Name
+                    DisplayName = $Field.DisplayName
+                    Id = $Field.Id
+                    IsPassword = $Field.IsPassword
+                    IsUrl = $Field.IsUrl
+                    IsNotes = $Field.IsNotes
+                    IsFile = $Field.IsFile
                 }
             }
         }

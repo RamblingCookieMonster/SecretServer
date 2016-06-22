@@ -34,9 +34,9 @@
     param(
         [string[]]$Name = $null,
         [string]$Id = $null,
+        [switch]$Raw,        
         [string]$Uri = $SecretServerConfig.Uri,
         [System.Web.Services.Protocols.SoapHttpClientProtocol]$WebServiceProxy = $SecretServerConfig.Proxy,
-        [switch]$Raw,
         [string]$Token = $SecretServerConfig.Token        
     )
 
@@ -52,11 +52,18 @@
 
     #Find all templates, filter on name
     if($Token) {
-        $AllTemplates = @( $WebServiceProxy.GetSecretTemplates($Token).SecretTemplates )
+        $AllTemplates = @( $WebServiceProxy.GetSecretTemplates($Token) )
     }
     else {
-        $AllTemplates = @( $WebServiceProxy.GetSecretTemplates().SecretTemplates )
+        $AllTemplates = @( $WebServiceProxy.GetSecretTemplates() )
     }
+
+    if($AllTemplates.Errors -and $AllTemplates.Errors.Count -gt 0) {
+        Write-Error "Secret server returned error $($AllTemplates.Errors | Out-String)"
+        return
+    }
+    $AllTemplates = $AllTemplates.SecretTemplates
+    Write-Verbose "Found $($AllTemplates.Count) templates"
 
     if($Name) {
         $AllTemplates = $AllTemplates | Foreach-Object {
@@ -67,10 +74,12 @@
             }
         }
     }
+    Write-Verbose "Filtered for name to $($AllTemplates.Count) templates"
     
     if($Id) {
         $AllTemplates  = $AllTemplates | Where-Object {$_.Id -like $Id}
     }
+    Write-Verbose "Filtered for id to $($AllTemplates.Count) templates"
         
     #Extract the secrets
     if($Raw) {
