@@ -112,10 +112,10 @@
                     }
                     else {
                         if($Token) {
-                            $WebServiceProxy.GeneratePassword($token,$Field.id).GeneratedPassword
+                            $Value = $WebServiceProxy.GeneratePassword($token,$Field.id).GeneratedPassword
                         }
                         else {
-                            $WebServiceProxy.GeneratePassword($Field.id).GeneratedPassword
+                            $Value = $WebServiceProxy.GeneratePassword($Field.id).GeneratedPassword
                         }
                     }
                 } else {
