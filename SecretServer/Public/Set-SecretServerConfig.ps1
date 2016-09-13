@@ -63,7 +63,7 @@
 
     #Write the global variable and the xml
     $Global:SecretServerConfig = $Existing
-    $Existing | Select -Property * -ExcludeProperty Proxy | Export-Clixml -Path "$PSScriptRoot\SecretServer_$($env:USERNAME).xml" -Force
+    $Existing | Select -Property * -ExcludeProperty Proxy | Export-Clixml -Path "$PSScriptRoot\..\SecretServer.xml" -Force
 }
 
 #publish

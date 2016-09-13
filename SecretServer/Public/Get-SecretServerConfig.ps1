@@ -14,18 +14,18 @@
         [ValidateSet("Variable","ConfigFile")]$Source = "Variable"
     )
 
-    if(-not (Test-Path -Path "$PSScriptRoot\SecretServer_$($env:USERNAME).xml" -ErrorAction SilentlyContinue)) {
+    if(-not (Test-Path -Path "$PSScriptRoot\..\SecretServer.xml" -ErrorAction SilentlyContinue)) {
         try {
-            Write-Verbose "Did not find config file $PSScriptRoot\SecretServer_$($env:USERNAME).xml attempting to create"
+            Write-Verbose "Did not find config file $PSScriptRoot\..\SecretServer.xml attempting to create"
             [pscustomobject]@{
                 Uri = $null
                 Token = $null
                 ServerInstance = $null
                 Database = $null
-            } | Export-Clixml -Path "$PSScriptRoot\SecretServer_$($env:USERNAME).xml" -Force -ErrorAction Stop
+            } | Export-Clixml -Path "$PSScriptRoot\..\SecretServer.xml" -Force -ErrorAction Stop
         }
         catch {
-            Write-Warning "Failed to create config file $PSScriptRoot\SecretServer_$($env:USERNAME).xml: $_"
+            Write-Warning "Failed to create config file $PSScriptRoot\..\SecretServer.xml: $_"
         }
     }    
 
@@ -33,7 +33,7 @@
         $SecretServerConfig
     }
     else {
-        Import-Clixml -Path "$PSScriptRoot\SecretServer_$($env:USERNAME).xml"
+        Import-Clixml -Path "$PSScriptRoot\..\SecretServer.xml"
     }
 }
 
