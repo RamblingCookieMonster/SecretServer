@@ -96,18 +96,27 @@
 
         $WebServiceProxy = Verify-SecretConnection -Proxy $WebServiceProxy -Token $Token
 
-
         $Fields = $Template.Fields 
         $InputValues = @{}
         foreach($Field in $Fields) {
             $Value = ""
             if($PSBoundParameters.ContainsKey($Field.DisplayName)) {
                 if($Field.IsPassword){
-                    try {
-                        $Value = Convert-SecStrToStr -secstr ($PSBoundParameters[$Field.DisplayName]) -ErrorAction stop
+                    if (($PSBoundParameters[$Field.DisplayName])) {
+                        try {
+                            $Value = Convert-SecStrToStr -secstr ($PSBoundParameters[$Field.DisplayName]) -ErrorAction stop
+                        }
+                        catch {
+                            Throw "$_"
+                        }
                     }
-                    catch {
-                        Throw "$_"
+                    else {
+                        if($Token) {
+                            $WebServiceProxy.GeneratePassword($token,$Field.id).GeneratedPassword
+                        }
+                        else {
+                            $WebServiceProxy.GeneratePassword($Field.id).GeneratedPassword
+                        }
                     }
                 } else {
                     $Value = $PSBoundParameters[$Field.DisplayName]
