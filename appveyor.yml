@@ -16,7 +16,7 @@ skip_commits:
 
 build: false
 install:
-  - ps: Install-Module Configuration
+  - ps: Install-Module Configuration -Force -ForceBootstrap
   - ps: Update-Module Pester
 build_script:
   - ps: .\Build.ps1 -Verbose 
