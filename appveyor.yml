@@ -16,7 +16,7 @@ skip_commits:
 
 build: false
 install:
-  - ps: Install-Module Configuration
+  - ps: Install-Package Configuration -Provider PowerShellGet -Force -ForceBootstrap
   - ps: Update-Module Pester
 build_script:
   - ps: .\Build.ps1 -Verbose 
