@@ -82,8 +82,21 @@
         $ParameterDictionary = new-object System.Management.Automation.RuntimeDefinedParameterDictionary
 
         foreach($Field in $Template.Fields) {
-            $Type = if($Field.IsPassword) { [securestring] } else { [string] }
-            $Attribute = [System.Management.Automation.ParameterAttribute]::new(), [System.Management.Automation.ValidateNotNullOrEmptyAttribute]::new()
+            $Type = if($Field.IsPassword) 
+            { 
+                [securestring] }
+            else 
+            { 
+                [string] 
+            }
+            $Attribute =  if($Field.IsPassword) 
+            { 
+                [System.Management.Automation.ParameterAttribute]::new() 
+            } 
+            else 
+            { 
+                [System.Management.Automation.ParameterAttribute]::new(), [System.Management.Automation.ValidateNotNullOrEmptyAttribute]::new() 
+            }
             $Parameter = new-object System.Management.Automation.RuntimeDefinedParameter( $Field.DisplayName, $Type, $Attribute)
             $ParameterDictionary.Add($Field.DisplayName, $Parameter)
         }
@@ -95,7 +108,6 @@
         $ConfirmAll = $false
 
         $WebServiceProxy = Verify-SecretConnection -Proxy $WebServiceProxy -Token $Token
-
 
         $Fields = $Template.Fields 
         $InputValues = @{}
@@ -113,6 +125,16 @@
                     $Value = $PSBoundParameters[$Field.DisplayName]
                 }
             }
+
+            if($Field.IsPassword -and ($Field.Value -eq $null)){
+                if($Token) {
+                    $Value = $WebServiceProxy.GeneratePassword($token,$Field.id).GeneratedPassword
+                }
+                else {
+                    $Value = $WebServiceProxy.GeneratePassword($Field.id).GeneratedPassword
+                }
+            }
+
             $Field | Add-Member NoteProperty Value $Value -Force
         }
 
